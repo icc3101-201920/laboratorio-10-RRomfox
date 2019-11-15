@@ -44,6 +44,7 @@ namespace Laboratorio_9_OOP_201920
                         }
                     }
                     break;
+
                 case EnumEffect.impenetrableFog:
                     for (int i = 0; i < 2; i++)
                     {
@@ -57,6 +58,7 @@ namespace Laboratorio_9_OOP_201920
                         }
                     }
                     break;
+
                 case EnumEffect.torrentialRain:
                     for (int i = 0; i < 2; i++)
                     {
@@ -70,24 +72,71 @@ namespace Laboratorio_9_OOP_201920
                         }
                     }
                     break;
+
                 case EnumEffect.clearWeather:
                     for (int i = 0; i < 2; i++)
                     {
-                        board.WeatherCards = new List<SpecialCard>();
-                        foreach (EnumType type in new List<EnumType>(){ EnumType.melee, EnumType.range, EnumType.longRange})
+                        EnumType type = EnumType.range;
+                        if (board.PlayerCards[i].ContainsKey(type))
                         {
-                            if (board.PlayerCards[i].ContainsKey(type))
+                            foreach (CombatCard card in board.PlayerCards[i][type])
                             {
-                                foreach (CombatCard card in board.PlayerCards[i][type])
-                                {
-                                    if (!card.Hero) card.AttackPoints = card.OriginalAttackPoints;
-                                }
-                            }  
+                                if (!card.Hero) card.AttackPoints = 1;
+                            }
                         }
 
                     }
                     break;
-           
+
+                case EnumEffect.buff:
+                    for (int i = 0; i < 2; i++)
+                    {
+                        EnumType type = playedCard.Type; //Asumo que con "misma linea" se referian a "mismo tipo" (puede que haya error de arrastre debido a este supesto)
+                        if (board.PlayerCards[i].ContainsKey(type))
+                        {
+                            foreach (CombatCard card in board.PlayerCards[i][type])
+                            {
+                                if (!card.Hero) card.AttackPoints *= 2;
+                            }
+                        }
+                    }
+                    break;
+
+                case EnumEffect.moraleBoost:
+                    for (int i = 0; i < 2; i++)
+                    {
+                        EnumType type = playedCard.Type;
+                        if (board.PlayerCards[i].ContainsKey(type))
+                        {
+                            foreach (CombatCard card in board.PlayerCards[i][type])
+                            {
+                                if (playedCard is CombatCard) if (playedCard == card) continue;
+                                if (!card.Hero) card.AttackPoints += 1;
+                            }
+                        }
+                    }
+                    break;
+
+                case EnumEffect.tightBond:
+                    for (int i = 0; i < 2; i++)
+                    {
+                        EnumType type = playedCard.Type;
+                        if (board.PlayerCards[i].ContainsKey(type))
+                        {
+                            foreach (CombatCard card in board.PlayerCards[i][type])
+                            {
+                                if (!card.Hero) if (card.Name == playedCard.Name) card.AttackPoints *= 2;
+                            }
+                        }
+                    }
+                    break;
+
+                case EnumEffect.spy:
+                    opponent.Board.AddCard(playedCard, opponent.Id);
+                    activePlayer.DrawCard();
+                    activePlayer.DrawCard();
+                    break;
+
                 default:
                     break;
                 
